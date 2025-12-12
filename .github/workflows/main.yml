@@ -21,4 +21,4 @@ jobs:
         net user runneradmin 123456
 
     - name: Show Tailscale IP
-      run: "C:\Program Files\Tailscale\tailscale.exe" ip
+      run: "C:\Program Files\Tailscale\tailscale.exe"
