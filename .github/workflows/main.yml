@@ -1,0 +1,24 @@
+name: RDP
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Install Tailscale
+      run: |
+        powershell -Command "Invoke-WebRequest https://pkgs.tailscale.com/stable/tailscale-setup-latest.exe -OutFile tailscale.exe"
+        powershell -Command "Start-Process .\tailscale.exe -ArgumentList '/quiet' -Wait"
+
+    - name: Login Tailscale
+      run: |
+        "C:\Program Files\Tailscale\tailscale.exe" up --authkey ${{ secrets.TAILSCALE_AUTHKEY }} --hostname github-windows --accept-routes --accept-dns
+
+    - name: Enable RDP
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        net user runneradmin 123456
+
+    - name: Show Tailscale IP
+      run: "C:\Program Files\Tailscale\tailscale.exe" ip
